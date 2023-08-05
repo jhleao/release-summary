@@ -2,11 +2,11 @@ name: 'Release Summary'
 description: 'Aggregate and format the description of all PRs involved in a release'
 author: 'jhleao'
 inputs:
-  condensed:
-    description: 'Condensed schema input'
+  base:
+    description: 'Base commit SHA'
     required: true
-  expanded:
-    description: 'Expanded schema input'
+  head:
+    description: 'Head commit SHA'
     required: true
 runs:
   using: 'node16'
