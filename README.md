@@ -1,18 +1,20 @@
 # release-summary
 
-Improve your releasing workflow by propagating practical notes throughout your development lifecycle.
+![alt text](.github/banner.png)
 
-This works with any CI setup, simply provide two commit SHAs to diff and it will return a formatted summary of all PR descriptions contained between them.
+Improves your releasing workflow by propagating practical notes throughout your development lifecycle.
+
+Works with any CI setup, simply provide two commit SHAs to diff against and this returns a formatted summary of all PR descriptions contained between them.
 
 ## The problem
 
 Consider the following scenario:
 
 1. Your setup is one `main` branch, one `development` branch and a number of feature branches.
-2. The `feature-1` branch has code from `dev-1`. This code has changes that require you to `change an environment variable in production as you deploy it`.
-3. The `feature-2` branch has code from `dev-2`. This has changes that require you to `run a database migration script manually`.
+2. The `feature-1` branch has code from `developer-1`. This code has changes that require you to `change an environment variable in production as you deploy it`.
+3. The `feature-2` branch has code from `developer-2`. This has changes that require you to `run a database migration script manually`.
 4. Both branches are merged to `development`.
-5. A day later, `dev-3` is assigned as the responsible for cutting a release, deploying and making sure everything works. But they have no context of what the changes are, what needs to be done manually (environment variables, migration script) and how to assess it's all working as it should.
+5. A day later, `developer-3` is assigned as the responsible for cutting a release, deploying and making sure everything works. But they have no context of what the changes are, what needs to be done manually (environment variables, migration scripts) and how to assess it's all working as it should.
 
 It's typical that these notes are taken in a non-structured way. e.g. Slack, or outlined in each feature PR description. These approaches are error prone and likely get lost in space at one point or another, leading to malsupervised releases.
 
@@ -100,7 +102,7 @@ jobs:
             });
 ```
 
-With the setup above, anytime someone opens a PR from `development` to `main`, the PR description will be updated with a summary of all the changes contained in it, what needs to be tested and what needs to happen on deployment.
+With the setup above, anytime someone opens a PR pointed at `main`, the PR description will be updated with a summary of all the changes contained in it, what needs to be tested and what needs to happen on deployment.
 
 ### Configuration
 
@@ -122,8 +124,4 @@ sections:
 
 ### Caveats
 
-This assumes merge PRs contain the default merge message (i.e. starts with "Merge pull request #..."). This is how PRs are extracted from diffs.
-
-```
-
-```
+This assumes merge commits contain the default merge message (i.e. starts with "Merge pull request #..."). This is how PR IDs are extracted from diffs.
