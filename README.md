@@ -1,6 +1,6 @@
 # release-summary
 
-![alt text](.github/banner.png)
+![alt text](.github/banner.svg)
 
 Improves your releasing workflow by propagating practical notes throughout your development lifecycle.
 
