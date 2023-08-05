@@ -103,7 +103,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: context.issue.number,
-              body: ${{ steps.generate-summary.outputs.summary }},
+              body: `${{ steps.generate-summary.outputs.summary }}`,
             });
 ```
 
