@@ -6,6 +6,10 @@ Improves your releasing workflow by propagating practical notes throughout your 
 
 Works with any CI setup, simply provide two commit SHAs to diff against and this returns a formatted summary of all PR descriptions contained between them.
 
+<p align="center">
+  <a href="https://github.com/jhleao/release-summary/actions"><img alt="build status" src="https://github.com/jhleao/release-summary/workflows/build-test/badge.svg"></a>
+</p>
+
 ## The problem
 
 Consider the following scenario:
