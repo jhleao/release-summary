@@ -1,18 +1,24 @@
 import * as core from '@actions/core';
-import { wait } from './wait';
+import { formatSummary } from './format-summary';
+import { getMergeCommits } from './util/get-merge-commits';
+import { extractPrIds } from './util/extract-pr-ids';
+import { extractPrDetails } from './util/extract-pr-details';
+import { getPrData } from './util/get-pr-data';
+import { parseConfig } from './config';
 
-async function run(): Promise<void> {
+async function run() {
   try {
-    const ms: string = core.getInput('milliseconds');
-    core.debug(`Waiting ${ms} milliseconds ...`);
+    const config = parseConfig();
 
-    core.debug(new Date().toTimeString());
-    await wait(parseInt(ms, 10));
-    core.debug(new Date().toTimeString());
+    const mergeCommits = await getMergeCommits();
+    const getPrIds = extractPrIds(mergeCommits);
+    const prData = await getPrData(getPrIds);
+    const prDetails = extractPrDetails(prData, config);
+    const summary = formatSummary(prDetails, config);
 
-    core.setOutput('time', new Date().toTimeString());
+    core.setOutput('summary', summary);
   } catch (error) {
-    if (error instanceof Error) core.setFailed(error.message);
+    core.setFailed(`Action failed with error: ${error}`);
   }
 }
 
