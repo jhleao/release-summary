@@ -61,7 +61,7 @@ sections:
     to: '### What needs to happen before, or right after deploying these changes?'
 
   - title: '### Steps to verify'
-    style: multine
+    style: multiline
     from: '### What needs to happen before, or right after deploying these changes?'
 ```
 
