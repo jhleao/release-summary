@@ -8,7 +8,7 @@
     "project": "./tsconfig.json"
   },
   "rules": {
-    "prettier/prettier": "warn",
+    "prettier/prettier": "off", // Prettier is conflicting with its own rule? Fix this later
     "i18n-text/no-en": "off",
     "eslint-comments/no-use": "off",
     "import/no-namespace": "off",
