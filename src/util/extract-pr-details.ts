@@ -6,7 +6,7 @@ export const extractPrDetails = (
 ): Record<string, ParsedPr> => {
   const result = {} as Record<string, ParsedPr>;
 
-  const buildPattern = (start: string, end?: string) => {
+  const buildPattern = (start: string, end?: string): RegExp => {
     if (!end) return new RegExp(`${start}\\s*([\\s\\S]*)$`);
     else return new RegExp(`${start}\\s*([\\s\\S]*?)${end}`);
   };
