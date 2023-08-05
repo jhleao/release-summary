@@ -1,0 +1,16 @@
+ignore_containing: ['Intentionally left blank']
+
+sections:
+  - title: '## Release summary'
+    style: condensed
+    from: '## Change description'
+    to: '### Steps to verify this works as intended'
+
+  - title: '### Deployment checklist'
+    style: multiline
+    from: '### Steps to verify this works as intended'
+    to: '### What needs to happen before, or right after deploying these changes?'
+
+  - title: '### Steps to verify'
+    style: multine
+    from: '### What needs to happen before, or right after deploying these changes?'
