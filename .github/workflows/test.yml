@@ -6,6 +6,11 @@ on:
       - main
       - 'releases/*'
 
+# Provide permissions for the workflow to read commit messages and write PR descriptions.
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
