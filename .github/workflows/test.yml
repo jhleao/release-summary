@@ -18,6 +18,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ./
+        env:
+          ACTIONS_STEP_DEBUG: true
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           base: ba2902d8ae4a1accc73c6b72f68d59af356d0d59
           head: 5ec4c61668e8edb3a58a59ab5ef0fdf91e690bb5
