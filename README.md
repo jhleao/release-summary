@@ -91,6 +91,7 @@ jobs:
         id: generate-summary
         uses: jhleao/release-summary@v1
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           base: ${{ github.event.pull_request.base.sha }}
           head: ${{ github.event.pull_request.head.sha }}
 
