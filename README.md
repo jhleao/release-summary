@@ -1,105 +1,129 @@
-<p align="center">
-  <a href="https://github.com/actions/typescript-action/actions"><img alt="typescript-action status" src="https://github.com/actions/typescript-action/workflows/build-test/badge.svg"></a>
-</p>
+# release-summary
 
-# Create a JavaScript Action using TypeScript
+Improve your releasing workflow by propagating practical notes throughout your development lifecycle.
 
-Use this template to bootstrap the creation of a TypeScript action.:rocket:
+This works with any CI setup, simply provide two commit SHAs to diff and it will return a formatted summary of all PR descriptions contained between them.
 
-This template includes compilation support, tests, a validation workflow, publishing, and versioning guidance.  
+## The problem
 
-If you are new, there's also a simpler introduction.  See the [Hello World JavaScript Action](https://github.com/actions/hello-world-javascript-action)
+Consider the following scenario:
 
-## Create an action from this template
+1. Your setup is one `main` branch, one `development` branch and a number of feature branches.
+2. The `feature-1` branch has code from `dev-1`. This code has changes that require you to `change an environment variable in production as you deploy it`.
+3. The `feature-2` branch has code from `dev-2`. This has changes that require you to `run a database migration script manually`.
+4. Both branches are merged to `development`.
+5. A day later, `dev-3` is assigned as the responsible for cutting a release, deploying and making sure everything works. But they have no context of what the changes are, what needs to be done manually (environment variables, migration script) and how to assess it's all working as it should.
 
-Click the `Use this Template` and provide the new repo details for your action
+It's typical that these notes are taken in a non-structured way. e.g. Slack, or outlined in each feature PR description. These approaches are error prone and likely get lost in space at one point or another, leading to malsupervised releases.
 
-## Code in Main
+## The solution
 
-> First, you'll need to have a reasonably modern version of `node` handy. This won't work with versions older than 9, for instance.
+Given two commit SHAs (e.g. a diff from a pull request), this GitHub Action finds all PR merges contained in this diff, parses their descriptions, and returns an aggregated version for easy review.
 
-Install the dependencies  
-```bash
-$ npm install
+In practical terms, this helps you quickly get the gist of what is being merged, and helps with pushing notes and checklists throughout all the process.
+
+How you format your notes is up to you. But as an example, say this is your pull request template:
+
+```markdown
+## Change description
+
+> Description here
+
+### Steps to verify this works as intended
+
+- [ ] Intentionally left blank
+
+### What needs to happen before, or right after deploying these changes?
+
+- [ ] Intentionally left blank
 ```
 
-Build the typescript and package it for distribution
-```bash
-$ npm run build && npm run package
-```
-
-Run the tests :heavy_check_mark:  
-```bash
-$ npm test
-
- PASS  ./index.test.js
-  ✓ throws invalid number (3ms)
-  ✓ wait 500 ms (504ms)
-  ✓ test runs (95ms)
-
-...
-```
-
-## Change action.yml
-
-The action.yml defines the inputs and output for your action.
-
-Update the action.yml with your name, description, inputs and outputs for your action.
-
-See the [documentation](https://help.github.com/en/articles/metadata-syntax-for-github-actions)
-
-## Change the Code
-
-Most toolkit and CI/CD operations involve async operations so the action is run in an async function.
-
-```javascript
-import * as core from '@actions/core';
-...
-
-async function run() {
-  try { 
-      ...
-  } 
-  catch (error) {
-    core.setFailed(error.message);
-  }
-}
-
-run()
-```
-
-See the [toolkit documentation](https://github.com/actions/toolkit/blob/master/README.md#packages) for the various packages.
-
-## Publish to a distribution branch
-
-Actions are run from GitHub repos so we will checkin the packed dist folder. 
-
-Then run [ncc](https://github.com/zeit/ncc) and push the results:
-```bash
-$ npm run package
-$ git add dist
-$ git commit -a -m "prod dependencies"
-$ git push origin releases/v1
-```
-
-Note: We recommend using the `--license` option for ncc, which will create a license file for all of the production node modules used in your project.
-
-Your action is now published! :rocket: 
-
-See the [versioning documentation](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md)
-
-## Validate
-
-You can now validate the action by referencing `./` in a workflow in your repo (see [test.yml](.github/workflows/test.yml))
+To utilize `release-summary` with the template above, in the scenario described earlier, you would have the following file in `./.github/.summaryrc.yml`:
 
 ```yaml
-uses: ./
-with:
-  milliseconds: 1000
+ignore_containing: ['Intentionally left blank']
+
+sections:
+  - title: '## Release summary'
+    style: condensed
+    from: '## Change description'
+    to: '### Steps to verify this works as intended'
+
+  - title: '### Deployment checklist'
+    style: multiline
+    from: '### Steps to verify this works as intended'
+    to: '### What needs to happen before, or right after deploying these changes?'
+
+  - title: '### Steps to verify'
+    style: multine
+    from: '### What needs to happen before, or right after deploying these changes?'
 ```
 
-See the [actions tab](https://github.com/actions/typescript-action/actions) for runs of this action! :rocket:
+And the following workflow in `./.github/workflows/release-summary.yml`:
 
-## Usage:
+```yaml
+name: Release summary
 
-After testing you can [create a v1 tag](https://github.com/actions/toolkit/blob/master/docs/action-versioning.md) to reference the stable and latest V1 action
+on:
+  pull_request:
+    types: [synchronize]
+    branches: [main]
+
+# Provide permissions for the workflow to read commit messages and write PR descriptions.
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  summarize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Generate summary
+        id: generate-summary
+        uses: jhleao/release-summary@v1
+        with:
+          base: ${{ github.event.pull_request.base.sha }}
+          head: ${{ github.event.pull_request.head.sha }}
+
+      - name: Update Current PR Description
+        uses: actions/github-script@v5
+        with:
+          script: |
+            await github.rest.pulls.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              body: ${{ steps.generate-summary.outputs.summary }},
+            });
+```
+
+With the setup above, anytime someone opens a PR from `development` to `main`, the PR description will be updated with a summary of all the changes contained in it, what needs to be tested and what needs to happen on deployment.
+
+### Configuration
+
+Configuration needs to be stored in in `./.github/.summaryrc.(yml|yaml)`:
+
+```yaml
+ignore_containing: ['If a section's content contains any of the strings here', 'it will be taken as empty.']
+
+sections:
+  - title: '## First section of your summary'
+    style: condensed|multiline
+    from: 'A string that marks the start of the section'
+    to: 'if you omit `to`, it is defaulted to the next `from`. If there isn't one, the rest of the PR description is taken.'
+
+  - title: '### Second section of your summary'
+    style: condensed|multiline
+    from: '### Header from one of your PR template sections'
+```
+
+### Caveats
+
+This assumes merge PRs contain the default merge message (i.e. starts with "Merge pull request #..."). This is how PRs are extracted from diffs.
+
+```
+
+```
