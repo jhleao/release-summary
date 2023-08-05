@@ -176,10 +176,15 @@ function run() {
         try {
             const config = (0, config_1.parseConfig)();
             const mergeCommits = yield (0, get_merge_commits_1.getMergeCommits)();
-            const getPrIds = (0, extract_pr_ids_1.extractPrIds)(mergeCommits);
-            const prData = yield (0, get_pr_data_1.getPrData)(getPrIds);
+            core.debug(`mergeCommits: ${JSON.stringify(mergeCommits)}`);
+            const prIds = (0, extract_pr_ids_1.extractPrIds)(mergeCommits);
+            core.debug(`getPrIds: ${JSON.stringify(prIds)}`);
+            const prData = yield (0, get_pr_data_1.getPrData)(prIds);
+            core.debug(`getPrData: ${JSON.stringify(prData)}`);
             const prDetails = (0, extract_pr_details_1.extractPrDetails)(prData, config);
+            core.debug(`getPrDetails: ${JSON.stringify(prDetails)}`);
             const summary = (0, format_summary_1.formatSummary)(prDetails, config);
+            core.debug(`summary: ${JSON.stringify(summary)}`);
             core.setOutput('summary', summary);
         }
         catch (error) {
@@ -224,7 +229,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.octokit = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
-const token = core.getInput('github-token', { required: true });
+const token = core.getInput('token', { required: true });
 exports.octokit = github.getOctokit(token).rest;
 
 
