@@ -11,10 +11,15 @@ async function run() {
     const config = parseConfig();
 
     const mergeCommits = await getMergeCommits();
-    const getPrIds = extractPrIds(mergeCommits);
-    const prData = await getPrData(getPrIds);
+    core.debug(`mergeCommits: ${JSON.stringify(mergeCommits)}`);
+    const prIds = extractPrIds(mergeCommits);
+    core.debug(`getPrIds: ${JSON.stringify(prIds)}`);
+    const prData = await getPrData(prIds);
+    core.debug(`getPrData: ${JSON.stringify(prData)}`);
     const prDetails = extractPrDetails(prData, config);
+    core.debug(`getPrDetails: ${JSON.stringify(prDetails)}`);
     const summary = formatSummary(prDetails, config);
+    core.debug(`summary: ${JSON.stringify(summary)}`);
 
     core.setOutput('summary', summary);
   } catch (error) {
