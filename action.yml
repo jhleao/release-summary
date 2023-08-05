@@ -1,0 +1,13 @@
+name: 'Release Summary'
+description: 'Aggregate and format the description of all PRs involved in a release'
+author: 'jhleao'
+inputs:
+  condensed:
+    description: 'Condensed schema input'
+    required: true
+  expanded:
+    description: 'Expanded schema input'
+    required: true
+runs:
+  using: 'node16'
+  main: 'dist/index.js'
