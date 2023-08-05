@@ -33,8 +33,8 @@ export const extractPrDetails = (
     for (const key in patterns) {
       const sectionContent =
         description.match(patterns[key])?.[1]?.trim() || null;
-      const shouldIgnore = config.ignore_containing.some((i) =>
-        sectionContent?.includes(i)
+      const shouldIgnore = config.ignore_containing.some(
+        (i) => sectionContent?.includes(i)
       );
       details[key] = !sectionContent || shouldIgnore ? null : sectionContent;
     }
