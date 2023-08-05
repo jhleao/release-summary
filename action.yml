@@ -1,6 +1,9 @@
 name: 'Release Summary'
 description: 'Aggregate and format the description of all PRs involved in a release'
 author: 'jhleao'
+branding:
+  icon: book
+  color: gray-dark
 inputs:
   token:
     description: 'GitHub token'
